@@ -52,6 +52,7 @@ app.post("/api/generate-content", async (req, res) => {
     res.status(500).json({ error: "Generation failed" });
   }
 });
+const PORT = process.env.PORT || 5050;
 
 app.listen(5050, () =>
   console.log("🚀 Server running on http://localhost:5050")
