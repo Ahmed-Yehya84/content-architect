@@ -147,3 +147,5 @@ function exportPlatform(platform, textId) {
 
   window.print();
 }
+
+// Final Version 2.0 - Forced Update
