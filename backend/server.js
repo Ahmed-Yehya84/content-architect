@@ -17,7 +17,9 @@ app.post("/api/generate-content", async (req, res) => {
     const { productIdea } = req.body;
 
     // Using 1.5-flash as it's the most stable for API deployments
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash-latest",
+    });
 
     const result = await model.generateContent({
       contents: [
