@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-all duration-300">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Architect | Gemini 2.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script>
+      tailwind.config = { darkMode: "class" };
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
+    <style>
+      .reveal-card {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .reveal-card.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #printSection,
+        #printSection * {
+          visibility: visible;
+        }
+        #printSection {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 40px;
+          color: black !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 transition-colors"
+  >
+    <div
+      id="loadingOverlay"
+      class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center backdrop-blur-md bg-white/40 dark:bg-slate-900/40 transition-opacity duration-500"
+    >
+      <div class="relative flex items-center justify-center">
+        <div
+          class="w-24 h-24 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin"
+        ></div>
+        <div
+          class="absolute w-14 h-14 border-4 border-cyan-500/20 border-b-cyan-500 rounded-full animate-[spin_0.8s_linear_infinite_reverse]"
+        ></div>
+      </div>
+      <p
+        class="mt-8 text-indigo-600 dark:text-indigo-400 font-black tracking-widest animate-pulse uppercase text-xs"
+      >
+        Architecting Content...
+      </p>
+    </div>
+
+    <header
+      class="max-w-7xl mx-auto pt-10 pb-6 px-6 flex justify-between items-center"
+    >
+      <div>
+        <h1 class="text-3xl font-black tracking-tight uppercase italic">
+          Content <span class="text-indigo-600">Architect</span>
+        </h1>
+        <div
+          class="flex items-center space-x-2 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full w-fit mt-1 border border-green-200 dark:border-green-800"
+        >
+          <div
+            class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"
+          ></div>
+          <span
+            class="text-[10px] font-bold text-green-700 dark:text-green-400 uppercase tracking-widest text-xs"
+            >Gemini 2.5 Active</span
+          >
+        </div>
+      </div>
+      <button
+        onclick="toggleTheme()"
+        class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 transition"
+      >
+        <span id="themeIcon">🌙</span>
+      </button>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6">
+      <div
+        class="flex gap-3 mb-10 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700"
+      >
+        <input
+          id="productInput"
+          type="text"
+          placeholder="What should the Architect build today?"
+          class="flex-1 p-4 bg-transparent outline-none text-lg"
+        />
+        <button
+          onclick="generate()"
+          class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg"
+        >
+          Generate
+        </button>
+        <button
+          id="clearBtn"
+          onclick="clearAll()"
+          class="hidden bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-6 py-4 rounded-xl font-medium"
+        >
+          Clear
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div
+          class="reveal-card bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm relative group"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-[10px] font-bold text-indigo-600 uppercase"
+              >LinkedIn</span
+            >
+            <div
+              class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                onclick="copyText('linkedinText')"
+                class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md hover:text-indigo-600"
+              >
+                Copy
+              </button>
+              <button
+                onclick="exportPlatform('LinkedIn', 'linkedinText')"
+                class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 px-2 py-1 rounded-md hover:bg-emerald-200"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <p
+            id="linkedinText"
+            class="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line"
+          >
+            Waiting...
+          </p>
+        </div>
+
+        <div
+          class="reveal-card bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm relative group"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-[10px] font-bold text-pink-500 uppercase"
+              >Instagram</span
+            >
+            <div
+              class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                onclick="copyText('instagramText')"
+                class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md hover:text-pink-600"
+              >
+                Copy
+              </button>
+              <button
+                onclick="exportPlatform('Instagram', 'instagramText')"
+                class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 px-2 py-1 rounded-md hover:bg-emerald-200"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <p
+            id="instagramText"
+            class="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line"
+          >
+            Waiting...
+          </p>
+        </div>
+
+        <div
+          class="reveal-card bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm relative group"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-[10px] font-bold text-cyan-500 uppercase"
+              >TikTok</span
+            >
+            <div
+              class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                onclick="copyText('tiktokText')"
+                class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md hover:text-cyan-600"
+              >
+                Copy
+              </button>
+              <button
+                onclick="exportPlatform('TikTok', 'tiktokText')"
+                class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 px-2 py-1 rounded-md hover:bg-emerald-200"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <p
+            id="tiktokText"
+            class="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line"
+          >
+            Waiting...
+          </p>
+        </div>
+
+        <div
+          class="reveal-card bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm relative group"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-[10px] font-bold text-red-500 uppercase"
+              >YouTube</span
+            >
+            <div
+              class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                onclick="copyText('youtubeText')"
+                class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md hover:text-red-600"
+              >
+                Copy
+              </button>
+              <button
+                onclick="exportPlatform('YouTube', 'youtubeText')"
+                class="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 px-2 py-1 rounded-md hover:bg-emerald-200"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <p
+            id="youtubeText"
+            class="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line leading-relaxed"
+          >
+            Waiting...
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
