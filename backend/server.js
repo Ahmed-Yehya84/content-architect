@@ -1,5 +1,5 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai"); // Ensure this matches package.json
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -9,17 +9,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// FIXED INITIALIZATION: No 'new' and correct class name
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// --- PRE-FLIGHT CHECK ---
+if (!process.env.GEMINI_API_KEY) {
+  console.error(
+    "❌ CRITICAL ERROR: GEMINI_API_KEY is missing from the environment!"
+  );
+} else {
+  console.log(
+    "✅ API Key detected (First 4 chars):",
+    process.env.GEMINI_API_KEY.substring(0, 4)
+  );
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
 
-    // Using 1.5-flash as it's the most stable for API deployments
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest",
-    });
+    // Google has been picky lately. Let's use the most specific stable name.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent({
       contents: [
@@ -27,30 +36,35 @@ app.post("/api/generate-content", async (req, res) => {
           role: "user",
           parts: [
             {
-              text: `You are a Content Architect & Video Director. Idea: "${productIdea}". 
-                                   Generate 4 distinct posts. For YouTube, provide a "Director's Script" with visual scenes and dialogue.
-                                   Return ONLY this JSON structure:
-                                   {
-                                       "linkedin": { "text": "..." },
-                                       "instagram": { "text": "..." },
-                                       "tiktok": { "text": "..." },
-                                       "youtube": { "text": "..." }
-                                   }`,
+              text: `You are a professional Content Architect. 
+                           Idea: "${productIdea}"
+                           Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
+                           Return ONLY valid JSON:
+                           {
+                               "linkedin": { "text": "..." },
+                               "instagram": { "text": "..." },
+                               "tiktok": { "text": "..." },
+                               "youtube": { "text": "..." }
+                           }`,
             },
           ],
         },
       ],
-      generationConfig: { response_mime_type: "application/json" },
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
     const response = await result.response;
-    const text = response.text();
-    res.json(JSON.parse(text));
+    const data = JSON.parse(response.text());
+    res.json(data);
   } catch (error) {
     console.error("AI Error:", error);
-    res
-      .status(500)
-      .json({ error: "Generation failed", details: error.message });
+    res.status(500).json({
+      error: "Generation failed",
+      message: error.message,
+      suggestion: "Check Render logs for the Pre-flight check result.",
+    });
   }
 });
 
