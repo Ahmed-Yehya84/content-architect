@@ -6,6 +6,15 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+app.options("*", cors());
 app.use(express.json());
 
 const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
