@@ -21,7 +21,8 @@ app.post("/api/generate-content", async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     // Using the v1 stable endpoint with the 'flash-latest' model identifier
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // Replace the URL line in your server.js with this one:
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
