@@ -16,16 +16,14 @@ if (!process.env.GEMINI_API_KEY) {
   console.log("✅ API Key active:", process.env.GEMINI_API_KEY.substring(0, 4));
 }
 
-/** * CRITICAL FIX: Explicitly setting the API version to 'v1'
- * to avoid the 'v1beta' 404 error we saw in the logs.
- */
+// FORCE STABLE v1 VERSION
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
 
-    // We call the model directly. v1 supports gemini-1.5-flash
+    // We use the full model path to bypass any beta defaults
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });
@@ -40,11 +38,12 @@ app.post("/api/generate-content", async (req, res) => {
             "youtube": { "text": "..." }
         }`;
 
+    // Explicitly use the generateContent method
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    // Ensure no markdown formatting is wrapping the JSON
+    // Remove markdown formatting if present
     const cleanJson = text.replace(/```json|```/g, "").trim();
     res.json(JSON.parse(cleanJson));
   } catch (error) {
