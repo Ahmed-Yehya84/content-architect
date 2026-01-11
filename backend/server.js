@@ -9,66 +9,50 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- PRE-FLIGHT CHECK ---
+// PRE-FLIGHT CHECK
 if (!process.env.GEMINI_API_KEY) {
-  console.error(
-    "❌ CRITICAL ERROR: GEMINI_API_KEY is missing from the environment!"
-  );
+  console.error("❌ GEMINI_API_KEY missing!");
 } else {
-  console.log(
-    "✅ API Key detected (First 4 chars):",
-    process.env.GEMINI_API_KEY.substring(0, 4)
-  );
+  console.log("✅ API Key active:", process.env.GEMINI_API_KEY.substring(0, 4));
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
+// Initialize the SDK
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
 
-    // Google has been picky lately. Let's use the most specific stable name.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // We are using 'gemini-pro' here because it is the most stable
+    // global endpoint that avoids the v1beta 404 error.
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const result = await model.generateContent({
-      contents: [
+    const prompt = `You are a Content Architect. Idea: "${productIdea}". 
+        Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
+        Return ONLY valid JSON in this format:
         {
-          role: "user",
-          parts: [
-            {
-              text: `You are a professional Content Architect. 
-                           Idea: "${productIdea}"
-                           Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
-                           Return ONLY valid JSON:
-                           {
-                               "linkedin": { "text": "..." },
-                               "instagram": { "text": "..." },
-                               "tiktok": { "text": "..." },
-                               "youtube": { "text": "..." }
-                           }`,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+            "linkedin": { "text": "..." },
+            "instagram": { "text": "..." },
+            "tiktok": { "text": "..." },
+            "youtube": { "text": "..." }
+        }`;
 
+    const result = await model.generateContent(prompt);
     const response = await result.response;
-    const data = JSON.parse(response.text());
-    res.json(data);
+    const text = response.text();
+
+    // Clean the text in case the AI adds markdown code blocks
+    const cleanJson = text.replace(/```json|```/g, "").trim();
+    res.json(JSON.parse(cleanJson));
   } catch (error) {
     console.error("AI Error:", error);
-    res.status(500).json({
-      error: "Generation failed",
-      message: error.message,
-      suggestion: "Check Render logs for the Pre-flight check result.",
-    });
+    res
+      .status(500)
+      .json({ error: "AI Processing Failed", details: error.message });
   }
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server is live on port ${PORT}`);
+  console.log(`🚀 Architect Server active on port ${PORT}`);
 });
