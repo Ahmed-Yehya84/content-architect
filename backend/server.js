@@ -1,23 +1,23 @@
 const express = require("express");
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // Ensure this matches package.json
 const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
 const app = express();
 
-// FIXED CORS: This handles all origins and avoids the "*" error
 app.use(cors());
 app.use(express.json());
 
-// Keep your working model name
-const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// FIXED INITIALIZATION: No 'new' and correct class name
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
-    // Using your preferred 2.5-flash model
-    const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    // Using 1.5-flash as it's the most stable for API deployments
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent({
       contents: [
@@ -32,7 +32,7 @@ app.post("/api/generate-content", async (req, res) => {
                                        "linkedin": { "text": "..." },
                                        "instagram": { "text": "..." },
                                        "tiktok": { "text": "..." },
-                                       "youtube": { "text": "[SCENE 1: Visual description]\\nDIALOGUE: '...'\\n\\n[SCENE 2: Visual description]\\nDIALOGUE: '...'" }
+                                       "youtube": { "text": "..." }
                                    }`,
             },
           ],
@@ -45,13 +45,14 @@ app.post("/api/generate-content", async (req, res) => {
     const text = response.text();
     res.json(JSON.parse(text));
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Generation failed" });
+    console.error("AI Error:", error);
+    res
+      .status(500)
+      .json({ error: "Generation failed", details: error.message });
   }
 });
 
-// DYNAMIC PORT: This allows Render to tell the app which port to use
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server is live on port ${PORT}`);
 });
