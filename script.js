@@ -25,11 +25,14 @@ async function generate() {
   toggleOverlay(true);
 
   try {
-    const response = await fetch("https://content-architect-api.onrender.com", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productIdea: idea }),
-    });
+    const response = await fetch(
+      "https://content-architect-api.onrender.com/api/generate-content",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productIdea: idea }),
+      }
+    );
 
     if (!response.ok) throw new Error("Server communication failed.");
 
