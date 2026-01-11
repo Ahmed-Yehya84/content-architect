@@ -1,5 +1,4 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -11,51 +10,74 @@ app.use(express.json());
 
 // PRE-FLIGHT CHECK
 if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY missing!");
+  console.error("❌ GEMINI_API_KEY is missing from Render Environment!");
 } else {
-  console.log("✅ API Key active:", process.env.GEMINI_API_KEY.substring(0, 4));
+  console.log("✅ API Key loaded:", process.env.GEMINI_API_KEY.substring(0, 4));
 }
-
-// FORCE STABLE v1 VERSION
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    // We use the full model path to bypass any beta defaults
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+    // FORCE STABLE V1 URL - No more v1beta!
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are a Content Architect. Idea: "${productIdea}". 
+                        Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
+                        Return ONLY valid JSON:
+                        {
+                            "linkedin": { "text": "..." },
+                            "instagram": { "text": "..." },
+                            "tiktok": { "text": "..." },
+                            "youtube": { "text": "..." }
+                        }`,
+              },
+            ],
+          },
+        ],
+      }),
     });
 
-    const prompt = `You are a Content Architect. Idea: "${productIdea}". 
-        Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
-        Return ONLY valid JSON:
-        {
-            "linkedin": { "text": "..." },
-            "instagram": { "text": "..." },
-            "tiktok": { "text": "..." },
-            "youtube": { "text": "..." }
-        }`;
+    const data = await response.json();
 
-    // Explicitly use the generateContent method
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    if (!response.ok) {
+      console.error("Google API Error Details:", data);
+      return res.status(response.status).json({
+        error: "Google API rejected the request",
+        details: data.error?.message || "Unknown error",
+      });
+    }
 
-    // Remove markdown formatting if present
-    const cleanJson = text.replace(/```json|```/g, "").trim();
+    // Extract the text from the response
+    const aiResponseText = data.candidates[0].content.parts[0].text;
+
+    // Clean up markdown code blocks if the AI includes them
+    const cleanJson = aiResponseText.replace(/```json|```/g, "").trim();
+
     res.json(JSON.parse(cleanJson));
   } catch (error) {
-    console.error("AI Error:", error);
-    res.status(500).json({
-      error: "AI Processing Failed",
-      message: error.message,
-    });
+    console.error("Server Crash Error:", error);
+    res
+      .status(500)
+      .json({
+        error: "Server failed to process content",
+        message: error.message,
+      });
   }
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Architect Server active on port ${PORT}`);
+  console.log(`🚀 NUCLEAR OPTION: Server live on port ${PORT}`);
 });
