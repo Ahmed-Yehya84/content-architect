@@ -25,7 +25,7 @@ async function generate() {
   toggleOverlay(true);
 
   try {
-    const response = await fetch("http://localhost:5050/api/generate-content", {
+    const response = await fetch("https://content-architect-api.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productIdea: idea }),
