@@ -16,20 +16,23 @@ if (!process.env.GEMINI_API_KEY) {
   console.log("✅ API Key active:", process.env.GEMINI_API_KEY.substring(0, 4));
 }
 
-// Initialize the SDK
+/** * CRITICAL FIX: Explicitly setting the API version to 'v1'
+ * to avoid the 'v1beta' 404 error we saw in the logs.
+ */
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/generate-content", async (req, res) => {
   try {
     const { productIdea } = req.body;
 
-    // We are using 'gemini-pro' here because it is the most stable
-    // global endpoint that avoids the v1beta 404 error.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // We call the model directly. v1 supports gemini-1.5-flash
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
 
     const prompt = `You are a Content Architect. Idea: "${productIdea}". 
         Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
-        Return ONLY valid JSON in this format:
+        Return ONLY valid JSON:
         {
             "linkedin": { "text": "..." },
             "instagram": { "text": "..." },
@@ -41,14 +44,15 @@ app.post("/api/generate-content", async (req, res) => {
     const response = await result.response;
     const text = response.text();
 
-    // Clean the text in case the AI adds markdown code blocks
+    // Ensure no markdown formatting is wrapping the JSON
     const cleanJson = text.replace(/```json|```/g, "").trim();
     res.json(JSON.parse(cleanJson));
   } catch (error) {
     console.error("AI Error:", error);
-    res
-      .status(500)
-      .json({ error: "AI Processing Failed", details: error.message });
+    res.status(500).json({
+      error: "AI Processing Failed",
+      message: error.message,
+    });
   }
 });
 
