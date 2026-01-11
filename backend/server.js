@@ -25,7 +25,7 @@ app.post("/api/generate-content", async (req, res) => {
 
     // We are using 'gemini-pro' here because it is the most stable
     // global endpoint that avoids the v1beta 404 error.
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are a Content Architect. Idea: "${productIdea}". 
         Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
