@@ -82,6 +82,7 @@ If you encounter issues, here is the hard-won knowledge from development:
 
 📜 License
 Distributed under the MIT License. See LICENSE for more information.
+```
 
 <p align="center"> Built with ❤️ and a lot of caffeine. </p>
 ```
