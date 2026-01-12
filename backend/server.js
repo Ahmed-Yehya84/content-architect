@@ -16,11 +16,14 @@ app.post("/api/generate-content", async (req, res) => {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const prompt = `
-            Product: "${productIdea}". 
-            Task: Generate a social media strategy ONLY for these platforms: ${platforms.join(
-              ", "
-            )}.
+            Product/Idea: "${productIdea}". 
+            Task: Generate high-converting content for: ${platforms.join(", ")}.
             
+            STRICT GUIDELINES:
+            1. For Instagram, LinkedIn, and TikTok: Provide engaging captions/posts with hashtags.
+            2. For YOUTUBE: Provide a structured VIDEO SCRIPT (including Hook, Body, and Call to Action).
+            3. For all platforms: Provide a 2-3 word "imageKeyword" for visual representation.
+
             Format: Return ONLY valid JSON.
             Structure:
             {
@@ -28,12 +31,11 @@ app.post("/api/generate-content", async (req, res) => {
                     ${platforms
                       .map(
                         (p) =>
-                          `"${p}": { "text": "Content here...", "imageKeyword": "2-3 word visual description" }`
+                          `"${p}": { "text": "...", "imageKeyword": "..." }`
                       )
                       .join(",\n                    ")}
                 }
             }
-            Important: Do not include markdown formatting or backticks. Ensure text is punchy and optimized for each platform.
         `;
 
     const response = await fetch(url, {
@@ -51,7 +53,7 @@ app.post("/api/generate-content", async (req, res) => {
     const data = await response.json();
 
     if (!data.candidates || !data.candidates[0]) {
-      throw new Error("AI failed to generate a response. Please try again.");
+      throw new Error("AI failed to generate a response.");
     }
 
     const aiText = data.candidates[0].content.parts[0].text;
@@ -64,7 +66,6 @@ app.post("/api/generate-content", async (req, res) => {
   }
 });
 
-// Render requires process.env.PORT
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log(`🚀 Architect Server running on port ${PORT}`)
