@@ -1,47 +1,50 @@
 # 🏗️ Content Architect
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=nodejs,express,js,html,tailwind,github,render" />
+  <img src="https://skillicons.dev/icons?i=nodejs,express,js,html,tailwind,github,render,vercel" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
-  <img src="https://img.shields.io/badge/Gemini%20Model-2.5%20Flash-blue" />
-  <img src="https://img.shields.io/badge/Status-Live-brightgreen" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  <img src="https://img.shields.io/badge/Gemini%20Model-2.5%20Flash-blue?style=for-the-badge&logo=google-gemini" />
+  <img src="https://img.shields.io/badge/UI%20Style-Glassmorphism-pink?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge" />
 </p>
 
 ---
 
-### 🌟 Overview
+### 🌟 High-Performance Content Strategy
 
-**Content Architect** is an AI-powered content strategy engine. It takes a single product idea and architecturally designs a full-scale social media presence across **LinkedIn**, **Instagram**, **TikTok**, and **YouTube**.
+**Content Architect** is a professional-grade AI engine that transforms a single product vision into a coordinated, multi-channel social media empire. Built to handle the specific API transitions of early 2026, it leverages **Gemini 2.5 Flash** for high-precision content generation.
 
-> [!NOTE]  
-> This project was built to survive the "Brutal API Wars" of early 2026, ensuring stable connections even when legacy models (1.5 Flash) were retired.
+### ✨ Advanced Features
+
+- **🎯 Selective Architecture:** Choose exactly which platforms (LinkedIn, IG, TikTok, YT) to generate for, optimizing API quota and strategy focus.
+- **🔮 Dual-Theme Engine:** Toggle between a classic "Solid" professional interface and a modern "Glassmorphism" aesthetic with real-time CSS backdrop filters.
+- **🤖 Agentic Loading Ticker:** A custom-built status system that provides transparency into the AI's "thought process" while generating content.
+- **🖼️ Visual Intelligence Preview:** Integrated dynamic image fetching to provide high-fidelity mobile mockups for Instagram and TikTok posts.
+- **📋 One-Click Export:** Smart clipboard integration with immediate visual UI feedback.
+- **⚙️ Rapid Configuration:** One-touch reset functionality to clear and pivot strategies instantly.
 
 ---
 
 ### 🛠️ Tech Stack
 
-| Category         | Tools                                                                                                                        |
-| :--------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| **Runtime**      | ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)                      |
-| **Framework**    | ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)    |
-| **Styling**      | ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) |
-| **Intelligence** | ![Google Gemini](https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)        |
-| **Deployment**   | ![Render](https://img.shields.io/badge/Render-%2346E3B7.svg?style=for-the-badge&logo=render&logoColor=white)                 |
+| Category         | Tools                                                            |
+| :--------------- | :--------------------------------------------------------------- |
+| **Intelligence** | **Google Gemini 2.5 Flash** (Strict JSON Output Mode)            |
+| **Backend**      | **Node.js / Express** (CORS-enabled for Cross-Origin Portfolios) |
+| **Frontend**     | **Tailwind CSS / Vanilla JS** (Vercel Edge Optimized)            |
+| **Visuals**      | **Unsplash Integration / FontAwesome 6**                         |
 
 ---
 
-### 🚀 Quick Start Guide
+### 🚀 Setup & Installation
 
-#### 1️⃣ Clone & Install
-
-```bash
-git clone [https://github.com/Ahmed-Yehya84/content-architect.git](https://github.com/Ahmed-Yehya84/content-architect.git)
-cd content-architect/backend
-npm install
+1. **Clone & Install:**
+   ```bash
+   git clone [https://github.com/Ahmed-Yehya84/content-architect.git](https://github.com/Ahmed-Yehya84/content-architect.git)
+   cd backend && npm install
+   ```
 
 2️⃣ Environment Setup 🔑
 Create a .env file in the backend folder:
@@ -78,3 +81,4 @@ If you encounter issues, here is the hard-won knowledge from development:
 Distributed under the MIT License. See LICENSE for more information.
 
 <p align="center"> Built with ❤️ and a lot of caffeine. </p>
+```

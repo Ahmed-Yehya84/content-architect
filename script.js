@@ -1,71 +1,57 @@
-let currentTheme = "solid";
-const tickerPhrases = [
-  "Analyzing your product idea...",
-  "Consulting Gemini 2.5 Intelligence...",
-  "Architecting LinkedIn hooks...",
-  "Drafting viral TikTok captions...",
-  "Structuring YouTube scripts...",
-  "Finalizing your strategy...",
-];
+let isDarkMode = true;
+let cardStyle = "solid";
 
-// Theme Toggling
-document
-  .getElementById("solidBtn")
-  .addEventListener("click", () => setTheme("solid"));
-document
-  .getElementById("glassBtn")
-  .addEventListener("click", () => setTheme("glass"));
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode;
+  const body = document.getElementById("bodyTag");
+  const icon = document.getElementById("themeIcon");
+  body.className = isDarkMode
+    ? "bg-slate-950 text-white min-h-screen font-sans"
+    : "bg-slate-50 text-slate-900 min-h-screen font-sans";
+  icon.className = isDarkMode
+    ? "fa-solid fa-moon text-blue-400"
+    : "fa-solid fa-sun text-yellow-500";
+  // Refresh cards to apply new light/dark colors
+  const lastData = JSON.parse(localStorage.getItem("lastResult") || "{}");
+  if (Object.keys(lastData).length > 0) renderCards(lastData);
+}
 
-function setTheme(theme) {
-  currentTheme = theme;
-  const sBtn = document.getElementById("solidBtn");
-  const gBtn = document.getElementById("glassBtn");
-
-  if (theme === "glass") {
-    gBtn.classList.add("bg-slate-700", "text-white");
-    gBtn.classList.remove("text-slate-500");
-    sBtn.classList.remove("bg-slate-700", "text-white");
-    sBtn.classList.add("text-slate-500");
-    document.body.className =
-      "bg-slate-950 text-white min-h-screen font-sans transition-all duration-500";
-  } else {
-    sBtn.classList.add("bg-slate-700", "text-white");
-    sBtn.classList.remove("text-slate-500");
-    gBtn.classList.remove("bg-slate-700", "text-white");
-    gBtn.classList.add("text-slate-500");
-    document.body.className =
-      "bg-slate-50 text-slate-900 min-h-screen font-sans transition-all duration-500";
-  }
+function setCardStyle(style) {
+  cardStyle = style;
+  document.getElementById("solidBtn").className =
+    style === "solid"
+      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white"
+      : "px-4 py-1 rounded-md text-xs text-slate-500";
+  document.getElementById("glassBtn").className =
+    style === "glass"
+      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white"
+      : "px-4 py-1 rounded-md text-xs text-slate-500";
+  const lastData = JSON.parse(localStorage.getItem("lastResult") || "{}");
+  if (Object.keys(lastData).length > 0) renderCards(lastData);
 }
 
 async function generate() {
   const productIdea = document.getElementById("productIdea").value;
-  const loading = document.getElementById("loading");
-  const results = document.getElementById("results");
+  const selectedPlatforms = Array.from(
+    document.querySelectorAll(".platform-checkbox:checked")
+  ).map((cb) => cb.value);
+
+  if (!productIdea || selectedPlatforms.length === 0)
+    return alert("Please provide an idea and select platforms!");
+
+  document.getElementById("results").innerHTML = "";
+  document.getElementById("loading").classList.remove("hidden");
+
+  // Smart Ticker
   const ticker = document.getElementById("tickerText");
-  const genBtn = document.getElementById("genBtn");
-
-  if (!productIdea) return alert("Please enter an idea first!");
-
-  // CORRECTED CHECKBOX LOGIC
-  const selectedPlatforms = [];
-  document.querySelectorAll(".platform-checkbox").forEach((cb) => {
-    if (cb.checked) {
-      selectedPlatforms.push(cb.value);
-    }
-  });
-
-  if (selectedPlatforms.length === 0)
-    return alert("Please select at least one platform!");
-
-  results.innerHTML = "";
-  loading.classList.remove("hidden");
-  genBtn.disabled = true;
-
-  let tickerIdx = 0;
-  const tickerInterval = setInterval(() => {
-    tickerIdx = (tickerIdx + 1) % tickerPhrases.length;
-    ticker.innerText = tickerPhrases[tickerIdx];
+  const phrases = [
+    `Analyzing ${productIdea}...`,
+    ...selectedPlatforms.map((p) => `Designing ${p} content...`),
+    "Finalizing...",
+  ];
+  let i = 0;
+  const interval = setInterval(() => {
+    ticker.innerText = phrases[i++ % phrases.length];
   }, 1500);
 
   try {
@@ -77,105 +63,83 @@ async function generate() {
         body: JSON.stringify({ productIdea, platforms: selectedPlatforms }),
       }
     );
-
     const data = await response.json();
-    renderCards(data, productIdea); // Pass product idea for image search
-  } catch (error) {
-    alert("Construction failed! " + error.message);
+    localStorage.setItem("lastResult", JSON.stringify(data.platforms));
+    renderCards(data.platforms);
+    document.getElementById("resetBtn").classList.remove("hidden");
+  } catch (e) {
+    alert("Fail: " + e.message);
   } finally {
-    clearInterval(tickerInterval);
-    loading.classList.add("hidden");
-    genBtn.disabled = false;
+    clearInterval(interval);
+    document.getElementById("loading").classList.add("hidden");
   }
 }
 
-function renderCards(data, query) {
-  const results = document.getElementById("results");
-  const themeClass =
-    currentTheme === "glass"
-      ? "glass-card text-white"
-      : "bg-white border-slate-200 shadow-sm text-slate-800";
+function renderCards(platforms) {
+  const grid = document.getElementById("results");
+  grid.innerHTML = "";
 
-  Object.entries(data).forEach(([platform, content]) => {
+  Object.entries(platforms).forEach(([name, content]) => {
     const card = document.createElement("div");
-    card.className = `${themeClass} p-6 rounded-2xl border fade-in flex flex-col`;
 
+    // BETTER SOLID STYLE: White background, gray borders, dark text
+    const baseStyle =
+      cardStyle === "glass"
+        ? "glass-card text-white"
+        : isDarkMode
+        ? "bg-slate-900 border-slate-800 text-white"
+        : "bg-white border-slate-200 text-slate-900 shadow-sm";
+
+    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all hover:shadow-xl`;
     card.innerHTML = `
             <div class="flex justify-between items-center mb-4">
-                <h3 class="capitalize font-bold text-lg">${platform}</h3>
-                <div class="flex gap-2">
-                    <button onclick="copyText(this, \`${content.text.replace(
-                      /`/g,
-                      "\\`"
-                    )}\`)" class="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-400">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
-                    <button onclick="openModal('${platform}', \`${content.text.replace(
-      /`/g,
-      "\\`"
-    )}\`, '${query}')" class="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-400">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
-                    </button>
+                <h3 class="capitalize font-bold text-lg">${name}</h3>
+                <div class="flex gap-3">
+                    <button onclick="copyText(this, \`${content.text}\`)" class="cursor-pointer hover:text-blue-500"><i class="fa-regular fa-copy"></i></button>
+                    <button onclick="openModal('${name}', \`${content.text}\`, '${content.imageKeyword}')" class="cursor-pointer hover:text-blue-500"><i class="fa-solid fa-mobile-screen-button"></i></button>
                 </div>
             </div>
-            <p class="${
-              currentTheme === "glass" ? "text-slate-300" : "text-slate-600"
-            } text-sm whitespace-pre-wrap">${content.text}</p>
+            <p class="text-sm leading-relaxed opacity-90">${content.text}</p>
         `;
-    results.appendChild(card);
+    grid.appendChild(card);
   });
 }
 
-function openModal(platform, text, query) {
-  const modal = document.getElementById("previewModal");
+function openModal(platform, text, keyword) {
   const content = document.getElementById("modalContent");
-  const keyword = query.split(" ")[0] || "business";
+  // Using a reliable 2026-safe Unsplash URL with Gemini's custom keyword
+  const imageUrl = `https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80`; // Fallback
+  const dynamicUrl = `https://loremflickr.com/400/400/${keyword.replace(
+    / /g,
+    ","
+  )}`;
 
-  // Create a "Phone Preview" Look
   content.innerHTML = `
-        <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-0.5">
-                <div class="w-full h-full rounded-full bg-slate-900 border-2 border-slate-900"></div>
+        <div class="bg-black rounded-[2rem] overflow-hidden border border-slate-800">
+            <div class="p-4 flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600"></div>
+                <span class="text-[10px] font-bold text-white">architect.ai</span>
             </div>
-            <span class="font-bold text-white">Your Brand</span>
+            <img src="${dynamicUrl}" class="w-full aspect-square object-cover">
+            <div class="p-4">
+                <div class="flex gap-3 mb-2 text-white text-sm"><i class="fa-regular fa-heart"></i><i class="fa-regular fa-comment"></i></div>
+                <p class="text-[10px] text-slate-300"><span class="font-bold text-white">architect.ai</span> ${text}</p>
+            </div>
         </div>
-        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400&q=80" 
-             class="w-full aspect-square object-cover rounded-lg mb-4 shadow-xl" 
-             alt="Post Preview">
-        <div class="flex gap-4 mb-3 text-white text-xl">
-            <i class="fa-regular fa-heart"></i>
-            <i class="fa-regular fa-comment"></i>
-            <i class="fa-regular fa-paper-plane"></i>
-        </div>
-        <p class="text-xs text-slate-300 leading-relaxed">
-            <span class="font-bold text-white mr-1">yourbrand</span>${text}
-        </p>
     `;
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
+  document.getElementById("previewModal").classList.remove("hidden");
+  document.getElementById("previewModal").classList.add("flex");
 }
 
-async function copyText(btn, text) {
-  await navigator.clipboard.writeText(text);
-  const icon = btn.querySelector("i");
-  icon.className = "fa-solid fa-check text-emerald-500";
-  setTimeout(() => (icon.className = "fa-regular fa-copy"), 2000);
+function resetApp() {
+  if (confirm("Reset everything?")) {
+    document.getElementById("productIdea").value = "";
+    document.getElementById("results").innerHTML = "";
+    document.getElementById("resetBtn").classList.add("hidden");
+    localStorage.removeItem("lastResult");
+  }
 }
 
 function closeModal() {
   document.getElementById("previewModal").classList.add("hidden");
 }
-
-// Reset Function for the Configuration Icon
-document
-  .getElementById("configuration")
-  .parentElement.addEventListener("click", () => {
-    if (confirm("Clear all inputs and results?")) {
-      document.getElementById("productIdea").value = "";
-      document.getElementById("results").innerHTML = "";
-      // Reset checkboxes to default
-      document
-        .querySelectorAll(".platform-checkbox")
-        .forEach((cb) => (cb.checked = true));
-    }
-  });
