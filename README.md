@@ -1,50 +1,53 @@
-# 🏗️ Content Architect
+# 🏛️ Content Architect | AI Strategy Engine
 
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=nodejs,express,js,html,tailwind,github,render,vercel" />
-</p>
+A premium, full-stack AI application that transforms a single content concept into a multi-platform social media strategy. Powered by Google Gemini 2.5 Flash, it generates platform-specific content, from professional LinkedIn posts to structured YouTube video scripts.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Gemini%20Model-2.5%20Flash-blue?style=for-the-badge&logo=google-gemini" />
-  <img src="https://img.shields.io/badge/UI%20Style-Glassmorphism-pink?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge" />
-</p>
+![Social Media Automation](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue)
+![Frontend](https://img.shields.io/badge/UI-Tailwind%20CSS-38bdf8)
+![Backend](https://img.shields.io/badge/Backend-Node.js-339933)
 
----
+## 🚀 Key Features
 
-### 🌟 High-Performance Content Strategy
+- **Multi-Platform Intelligence**: Generates tailored content for LinkedIn, Instagram, TikTok, and YouTube.
+- **Specialized YouTube Scripting**: Unlike standard captions, the engine architects full video scripts including Hooks, Body Content, and CTAs.
+- **Quad-Style UI Engine**: Features a seamless transition between:
+  - **Themes**: Light & Dark mode.
+  - **Visual Styles**: Solid & Glassmorphism (Glass-card) interfaces.
+- **Smart Visual Keywords**: AI suggests "imageKeywords" for every post, integrated with dynamic image fetching for realistic previews.
+- **Robust Backend Architecture**: Implemented custom retry logic to handle API cold starts, ensuring high reliability for end-users.
+- **Responsive Preview Modal**: A mobile-first previewer with scrollable content support and asynchronous image loading.
 
-**Content Architect** is a professional-grade AI engine that transforms a single product vision into a coordinated, multi-channel social media empire. Built to handle the specific API transitions of early 2026, it leverages **Gemini 2.5 Flash** for high-precision content generation.
+## 🛠️ Tech Stack
 
-### ✨ Advanced Features
+- **Frontend**: HTML5, Tailwind CSS (JIT), JavaScript (ES6+).
+- **Backend**: Node.js, Express.
+- **AI Integration**: Google Generative AI (Gemini 2.5 Flash API).
+- **Deployment**: Render (Backend) & Vercel/GitHub Pages (Frontend).
 
-- **🎯 Selective Architecture:** Choose exactly which platforms (LinkedIn, IG, TikTok, YT) to generate for, optimizing API quota and strategy focus.
-- **🔮 Dual-Theme Engine:** Toggle between a classic "Solid" professional interface and a modern "Glassmorphism" aesthetic with real-time CSS backdrop filters.
-- **🤖 Agentic Loading Ticker:** A custom-built status system that provides transparency into the AI's "thought process" while generating content.
-- **🖼️ Visual Intelligence Preview:** Integrated dynamic image fetching to provide high-fidelity mobile mockups for Instagram and TikTok posts.
-- **📋 One-Click Export:** Smart clipboard integration with immediate visual UI feedback.
-- **⚙️ Rapid Configuration:** One-touch reset functionality to clear and pivot strategies instantly.
+## 📸 Usage Example
 
----
+1.  **Enter a Concept**: "A 7-day road trip from Moscow to St. Petersburg."
+2.  **Select Channels**: Choose YouTube and Instagram.
+3.  **Architect**: The AI generates a 10-minute video script for YouTube and a high-engagement carousel caption for Instagram.
+4.  **Preview**: Use the 'Mobile Preview' icon to see how the content looks in a real-world social feed.
 
-### 🛠️ Tech Stack
+## ⚙️ Installation & Setup
 
-| Category         | Tools                                                            |
-| :--------------- | :--------------------------------------------------------------- |
-| **Intelligence** | **Google Gemini 2.5 Flash** (Strict JSON Output Mode)            |
-| **Backend**      | **Node.js / Express** (CORS-enabled for Cross-Origin Portfolios) |
-| **Frontend**     | **Tailwind CSS / Vanilla JS** (Vercel Edge Optimized)            |
-| **Visuals**      | **Unsplash Integration / FontAwesome 6**                         |
+1.  **Clone the Repository**:
+    ```bash
+    git clone [https://github.com/Ahmed-Yehya84/content-architect.git](https://github.com/Ahmed-Yehya84/content-architect.git)
+    ```
+2.  **Backend Setup**:
+    - Navigate to `/backend`.
+    - Run `npm install`.
+    - Create a `.env` file and add: `GEMINI_API_KEY=your_key_here`.
+    - Start server: `npm start`.
+3.  **Frontend Setup**:
+    - Open `index.html` in your browser or serve via Live Server.
 
----
+## 📄 License
 
-### 🚀 Setup & Installation
-
-1. **Clone & Install:**
-   ```bash
-   git clone [https://github.com/Ahmed-Yehya84/content-architect.git](https://github.com/Ahmed-Yehya84/content-architect.git)
-   cd backend && npm install
-   ```
+MIT License - Created for Professional Portfolio Use.
 
 2️⃣ Environment Setup 🔑
 Create a .env file in the backend folder:
