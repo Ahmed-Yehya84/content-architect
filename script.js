@@ -165,3 +165,17 @@ async function copyText(btn, text) {
 function closeModal() {
   document.getElementById("previewModal").classList.add("hidden");
 }
+
+// Reset Function for the Configuration Icon
+document
+  .getElementById("configuration")
+  .parentElement.addEventListener("click", () => {
+    if (confirm("Clear all inputs and results?")) {
+      document.getElementById("productIdea").value = "";
+      document.getElementById("results").innerHTML = "";
+      // Reset checkboxes to default
+      document
+        .querySelectorAll(".platform-checkbox")
+        .forEach((cb) => (cb.checked = true));
+    }
+  });
