@@ -13,6 +13,7 @@ app.post("/api/generate-content", async (req, res) => {
 
     if (!apiKey) throw new Error("API Key is missing from environment.");
 
+    // Using Gemini 2.5 Flash as requested
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const prompt = `
@@ -38,25 +39,49 @@ app.post("/api/generate-content", async (req, res) => {
             }
         `;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: "application/json",
-          temperature: 0.7,
-        },
-      }),
-    });
+    let aiResponse;
+    let attempts = 0;
+    const maxAttempts = 2;
 
-    const data = await response.json();
+    // Retry Logic to solve the "Second Click" issue
+    while (attempts < maxAttempts) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              response_mime_type: "application/json",
+              temperature: 0.7,
+            },
+          }),
+        });
 
-    if (!data.candidates || !data.candidates[0]) {
-      throw new Error("AI failed to generate a response.");
+        aiResponse = await response.json();
+
+        // Check if we have a valid candidate
+        if (aiResponse.candidates && aiResponse.candidates[0]) {
+          break;
+        }
+      } catch (fetchError) {
+        console.error(
+          `Fetch Attempt ${attempts + 1} failed:`,
+          fetchError.message
+        );
+      }
+
+      attempts++;
+      if (attempts < maxAttempts) {
+        console.log(`Retrying Gemini API... Attempt ${attempts + 1}`);
+      }
     }
 
-    const aiText = data.candidates[0].content.parts[0].text;
+    if (!aiResponse || !aiResponse.candidates || !aiResponse.candidates[0]) {
+      throw new Error("AI failed to generate a response. Please try again.");
+    }
+
+    const aiText = aiResponse.candidates[0].content.parts[0].text;
     res.json(JSON.parse(aiText));
   } catch (error) {
     console.error("Server Error:", error.message);
