@@ -1,82 +1,113 @@
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
 const cors = require("cors");
 
-dotenv.config();
 const app = express();
 
-app.use(cors());
+// Middleware
+app.use(
+  cors({
+    origin: "*", // In production, replace with your frontend URL for better security
+  })
+);
 app.use(express.json());
 
-// PRE-FLIGHT CHECK
-if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY is missing from Render!");
-} else {
-  console.log("✅ API Key loaded:", process.env.GEMINI_API_KEY.substring(0, 4));
-}
+// Health Check
+app.get("/", (req, res) => {
+  res.send("🚀 Content Architect API is running...");
+});
 
+// Main Generation Route
 app.post("/api/generate-content", async (req, res) => {
   try {
-    const { productIdea } = req.body;
+    const { productIdea, platforms } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Using the v1 stable endpoint with the 'flash-latest' model identifier
-    // Replace the URL line in your server.js with this one:
+    if (!apiKey) {
+      return res
+        .status(500)
+        .json({ error: "Server Error", details: "API Key missing on server." });
+    }
+
+    // The 2026 Stable Model URL
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+    // Construct a strict prompt to ensure JSON output and platform filtering
+    const prompt = `
+            You are a professional Content Architect. 
+            Product Idea: "${productIdea}". 
+            
+            TASK:
+            Generate a social media content strategy ONLY for these platforms: ${platforms.join(
+              ", "
+            )}.
+            
+            FORMATTING RULES:
+            - Return ONLY a valid JSON object.
+            - Do not include markdown formatting like \`\`\`json.
+            - Each platform object must contain a "text" field with the post content.
+            
+            REQUIRED JSON STRUCTURE:
+            {
+                ${platforms
+                  .map(
+                    (p) => `"${p}": { "text": "Crafted content for ${p}..." }`
+                  )
+                  .join(",\n                ")}
+            }
+        `;
 
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [
           {
-            parts: [
-              {
-                text: `You are a Content Architect. Idea: "${productIdea}". 
-                        Generate 4 posts for LinkedIn, Instagram, TikTok, and a YouTube script.
-                        Return ONLY valid JSON in this format:
-                        {
-                            "linkedin": { "text": "..." },
-                            "instagram": { "text": "..." },
-                            "tiktok": { "text": "..." },
-                            "youtube": { "text": "..." }
-                        }`,
-              },
-            ],
+            parts: [{ text: prompt }],
           },
         ],
+        generationConfig: {
+          response_mime_type: "application/json",
+        },
       }),
     });
 
     const data = await response.json();
 
-    // Detailed error logging if Google rejects the request
     if (!response.ok) {
       console.error("Google API Full Error:", JSON.stringify(data, null, 2));
       return res.status(response.status).json({
         error: "Google API Error",
-        details:
-          data.error?.message || "Check Render logs for full JSON error body.",
+        details: data.error?.message || "Check quota or model availability.",
       });
     }
 
-    // Logic to extract and clean AI response
-    const aiResponseText = data.candidates[0].content.parts[0].text;
-    const cleanJson = aiResponseText.replace(/```json|```/g, "").trim();
+    // Extract the text from the response
+    let aiResponseText = data.candidates[0].content.parts[0].text;
 
-    res.json(JSON.parse(cleanJson));
+    // Final safety cleanup of the string before parsing
+    const cleanJsonString = aiResponseText.replace(/```json|```/g, "").trim();
+    const parsedResponse = JSON.parse(cleanJsonString);
+
+    res.json(parsedResponse);
   } catch (error) {
-    console.error("Server Side Error:", error);
+    console.error("Server Crash Log:", error);
     res.status(500).json({
-      error: "Failed to process content",
+      error: "Internal Server Error",
       message: error.message,
     });
   }
 });
 
+// Start the Server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
+  console.log(
+    `✅ API Key loaded: ${
+      process.env.GEMINI_API_KEY
+        ? "Yes (Starts with " + process.env.GEMINI_API_KEY.substring(0, 4) + ")"
+        : "NO"
+    }`
+  );
   console.log(`🚀 ARCHITECT SERVER LIVE ON PORT ${PORT}`);
 });
