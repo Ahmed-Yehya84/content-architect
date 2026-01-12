@@ -16,7 +16,6 @@ function toggleDarkMode() {
     icon.className = "fa-solid fa-sun text-yellow-500";
   }
 
-  // Ghosting fix: Only refresh view if results are present
   if (document.getElementById("results").innerHTML !== "") {
     refreshCurrentView();
   }
@@ -99,18 +98,19 @@ function renderCards(platforms) {
   Object.entries(platforms).forEach(([name, content]) => {
     const card = document.createElement("div");
 
+    // ENHANCED VISIBILITY LOGIC: Added shadow-xl and ring border for Light Mode
     const baseStyle =
       cardStyle === "glass"
         ? "glass-card text-white"
         : isDarkMode
         ? "bg-slate-900 border-slate-800 text-white shadow-xl"
-        : "bg-white border-slate-200 text-slate-800 shadow-md";
+        : "bg-white border-slate-200 text-slate-800 shadow-xl ring-1 ring-slate-200/50";
 
-    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all`;
+    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all hover:scale-[1.01]`;
     card.innerHTML = `
             <div class="flex justify-between items-center mb-4">
                 <h3 class="capitalize font-bold text-lg">${name}</h3>
-                <div class="flex gap-3">
+                <div class="flex gap-3 text-slate-400">
                     <button onclick="copyText(this, \`${content.text.replace(
                       /`/g,
                       "\\`"
