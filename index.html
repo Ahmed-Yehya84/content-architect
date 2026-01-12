@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Content Architect | AI Strategy</title>
+    <title>Content Architect | AI Strategy Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -11,18 +11,18 @@
     />
     <style>
       .glass-card {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
       }
       .fade-in {
-        animation: fadeIn 0.5s ease-in;
+        animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
       @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateY(15px);
         }
         to {
           opacity: 1;
@@ -30,137 +30,166 @@
         }
       }
 
-      /* Smooth theme transition */
       body {
-        transition: background-color 0.4s ease, color 0.4s ease;
+        transition: background-color 0.5s ease;
       }
-      .platform-checkbox:checked + span {
-        border-color: currentColor;
-        background: rgba(128, 128, 128, 0.1);
+
+      /* Premium custom scrollbar for the modal */
+      #modalContent::-webkit-scrollbar {
+        width: 4px;
+      }
+      #modalContent::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #modalContent::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
       }
     </style>
   </head>
-  <body id="bodyTag" class="bg-slate-950 text-white min-h-screen font-sans">
+  <body
+    id="bodyTag"
+    class="bg-slate-950 text-white min-h-screen font-sans antialiased"
+  >
     <div class="max-w-6xl mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-12">
-        <h1
-          class="text-3xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"
-        >
-          CONTENT ARCHITECT
-        </h1>
-        <div class="flex items-center gap-4">
-          <button
-            onclick="toggleDarkMode()"
-            class="p-2 rounded-full hover:bg-slate-800 transition-all text-xl"
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20"
           >
-            <i id="themeIcon" class="fa-solid fa-moon"></i>
-          </button>
+            <i class="fa-solid fa-compass-drafting text-white text-xl"></i>
+          </div>
+          <h1
+            class="text-2xl font-black tracking-tighter [.bg-slate-50_&]:text-slate-900"
+          >
+            CONTENT <span class="text-blue-500">ARCHITECT</span>
+          </h1>
         </div>
+        <button
+          onclick="toggleDarkMode()"
+          class="p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:scale-110 transition-all [.bg-slate-50_&]:bg-white [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:shadow-sm"
+        >
+          <i id="themeIcon" class="fa-solid fa-moon text-blue-400"></i>
+        </button>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-8">
+      <div class="grid lg:grid-cols-3 gap-10">
         <div class="lg:col-span-1">
           <div
-            class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-sm sticky top-8"
+            class="bg-slate-900/60 p-7 rounded-3xl border border-slate-800 shadow-2xl backdrop-blur-md sticky top-8 [.bg-slate-50_&]:bg-white [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:shadow-xl"
           >
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-bold">Configuration</h2>
+            <div class="flex justify-between items-center mb-8">
+              <h2
+                class="text-lg font-bold flex items-center gap-2 [.bg-slate-50_&]:text-slate-900"
+              >
+                <i class="fa-solid fa-sliders text-blue-500"></i> Configuration
+              </h2>
               <button
                 id="resetBtn"
                 onclick="resetApp()"
-                class="hidden text-xs bg-red-500/10 text-red-400 px-3 py-1 rounded-full border border-red-500/20 hover:bg-red-500/20 transition-all"
+                class="hidden text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 px-3 py-1.5 rounded-full border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-bold"
               >
-                <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                Reset All
               </button>
             </div>
 
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-slate-400 mb-2"
-                >Product Idea</label
+            <div class="mb-8">
+              <label
+                class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3"
+                >Product Concept</label
               >
               <textarea
                 id="productIdea"
-                class="w-full bg-slate-950/50 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all resize-none [.bg-slate-50_&]:bg-slate-50 [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:text-slate-900"
                 rows="4"
-                placeholder="e.g. A motorcycle trip across Egypt..."
+                placeholder="Describe your product or trip..."
               ></textarea>
             </div>
 
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-slate-400 mb-3"
-                >Select Channels</label
+            <div class="mb-8">
+              <label
+                class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-4"
+                >Target Channels</label
               >
               <div class="grid grid-cols-2 gap-3">
-                <label class="cursor-pointer group"
-                  ><input
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="linkedin"
                     checked
                     class="platform-checkbox hidden"
-                  /><span
-                    class="flex items-center justify-center p-3 rounded-xl border border-slate-700 text-slate-400 group-has-[:checked]:text-blue-400 group-has-[:checked]:border-blue-500"
-                    >LinkedIn</span
-                  ></label
-                >
-                <label class="cursor-pointer group"
-                  ><input
+                  />
+                  <div
+                    class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-blue-500 group-has-[:checked]:text-blue-400 transition-all [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:bg-slate-50"
+                  >
+                    LinkedIn
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="instagram"
                     checked
                     class="platform-checkbox hidden"
-                  /><span
-                    class="flex items-center justify-center p-3 rounded-xl border border-slate-700 text-slate-400 group-has-[:checked]:text-pink-400 group-has-[:checked]:border-pink-500"
-                    >Instagram</span
-                  ></label
-                >
-                <label class="cursor-pointer group"
-                  ><input
+                  />
+                  <div
+                    class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-pink-500 group-has-[:checked]:text-pink-400 transition-all [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:bg-slate-50"
+                  >
+                    Instagram
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="tiktok"
                     checked
                     class="platform-checkbox hidden"
-                  /><span
-                    class="flex items-center justify-center p-3 rounded-xl border border-slate-700 text-slate-400 group-has-[:checked]:text-cyan-400 group-has-[:checked]:border-cyan-400"
-                    >TikTok</span
-                  ></label
-                >
-                <label class="cursor-pointer group"
-                  ><input
+                  />
+                  <div
+                    class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-cyan-500 group-has-[:checked]:text-cyan-400 transition-all [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:bg-slate-50"
+                  >
+                    TikTok
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="youtube"
                     checked
                     class="platform-checkbox hidden"
-                  /><span
-                    class="flex items-center justify-center p-3 rounded-xl border border-slate-700 text-slate-400 group-has-[:checked]:text-red-400 group-has-[:checked]:border-red-500"
-                    >YouTube</span
-                  ></label
-                >
+                  />
+                  <div
+                    class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-red-500 group-has-[:checked]:text-red-400 transition-all [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:bg-slate-50"
+                  >
+                    YouTube
+                  </div>
+                </label>
               </div>
             </div>
 
             <div
-              class="flex items-center justify-between mb-8 p-3 bg-slate-950/50 rounded-xl border border-slate-800"
+              class="mb-8 flex items-center justify-between p-2 bg-slate-950/50 rounded-2xl border border-slate-800 [.bg-slate-50_&]:bg-slate-100 [.bg-slate-50_&]:border-slate-200"
             >
               <span
-                class="text-xs text-slate-400 uppercase tracking-widest font-bold"
-                >Card Style</span
+                class="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest"
+                >Card UI</span
               >
               <div
-                class="flex bg-slate-900 p-1 rounded-lg border border-slate-700"
+                class="flex bg-slate-900 rounded-xl p-1 [.bg-slate-50_&]:bg-white"
               >
                 <button
                   id="solidBtn"
                   onclick="setCardStyle('solid')"
-                  class="px-4 py-1 rounded-md text-xs bg-slate-700 text-white transition-all"
+                  class="px-4 py-2 rounded-lg text-[10px] font-bold bg-slate-700 text-white transition-all"
                 >
-                  Solid
+                  SOLID
                 </button>
                 <button
                   id="glassBtn"
                   onclick="setCardStyle('glass')"
-                  class="px-4 py-1 rounded-md text-xs text-slate-500 hover:text-white transition-all"
+                  class="px-4 py-2 rounded-lg text-[10px] font-bold text-slate-500 hover:text-white transition-all"
                 >
-                  Glass
+                  GLASS
                 </button>
               </div>
             </div>
@@ -168,10 +197,9 @@
             <button
               onclick="generate()"
               id="genBtn"
-              class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              class="w-full py-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl font-black text-sm hover:shadow-2xl hover:shadow-blue-500/40 transition-all flex items-center justify-center gap-3"
             >
-              <span>Architect Strategy</span>
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              ARCHITECT STRATEGY <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </div>
@@ -179,18 +207,24 @@
         <div class="lg:col-span-2">
           <div
             id="loading"
-            class="hidden flex flex-col items-center justify-center py-20 space-y-4"
+            class="hidden flex flex-col items-center justify-center py-32 space-y-6"
           >
-            <div
-              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
-            ></div>
+            <div class="relative w-16 h-16">
+              <div
+                class="absolute inset-0 rounded-full border-4 border-blue-500/20"
+              ></div>
+              <div
+                class="absolute inset-0 rounded-full border-4 border-t-blue-500 animate-spin"
+              ></div>
+            </div>
             <p
               id="tickerText"
-              class="text-blue-400 font-medium animate-pulse text-lg text-center"
+              class="text-blue-400 font-bold tracking-widest text-sm uppercase animate-pulse"
             >
-              Architecting...
+              Initializing Architecture...
             </p>
           </div>
+
           <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
       </div>
@@ -198,18 +232,16 @@
 
     <div
       id="previewModal"
-      class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+      class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex items-center justify-center p-4"
     >
-      <div
-        class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-[3rem] p-6 relative shadow-2xl"
-      >
+      <div class="w-full max-w-[380px] relative">
         <button
           onclick="closeModal()"
-          class="absolute top-6 right-6 text-slate-400 hover:text-white"
+          class="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors"
         >
-          <i class="fa-solid fa-xmark text-2xl"></i>
+          <i class="fa-solid fa-xmark text-3xl"></i>
         </button>
-        <div id="modalContent" class="mt-8 overflow-y-auto max-h-[70vh]"></div>
+        <div id="modalContent" class="fade-in"></div>
       </div>
     </div>
 
