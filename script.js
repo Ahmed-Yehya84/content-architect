@@ -22,12 +22,12 @@ function setCardStyle(style) {
   cardStyle = style;
   document.getElementById("solidBtn").className =
     style === "solid"
-      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white"
-      : "px-4 py-1 rounded-md text-xs text-slate-500";
+      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white font-bold"
+      : "px-4 py-1 rounded-md text-xs text-slate-500 font-bold";
   document.getElementById("glassBtn").className =
     style === "glass"
-      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white"
-      : "px-4 py-1 rounded-md text-xs text-slate-500";
+      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white font-bold"
+      : "px-4 py-1 rounded-md text-xs text-slate-500 font-bold";
   refreshCurrentView();
 }
 
@@ -38,7 +38,6 @@ function refreshCurrentView() {
 
 async function generate() {
   const productIdea = document.getElementById("productIdea").value;
-  // Explicitly grab ONLY checked boxes at the moment of clicking
   const selectedPlatforms = Array.from(
     document.querySelectorAll(".platform-checkbox:checked")
   ).map((cb) => cb.value);
@@ -46,7 +45,7 @@ async function generate() {
   if (!productIdea || selectedPlatforms.length === 0)
     return alert("Please provide an idea and select at least one platform!");
 
-  // Clear UI before starting
+  // Logic Fix: Hard clear the grid and storage before new generation
   document.getElementById("results").innerHTML = "";
   localStorage.removeItem("lastResult");
 
@@ -54,9 +53,10 @@ async function generate() {
   const ticker = document.getElementById("tickerText");
   const phrases = [
     `Analyzing ${productIdea}...`,
-    ...selectedPlatforms.map((p) => `Designing ${p} content...`),
-    "Architecting...",
+    ...selectedPlatforms.map((p) => `Designing ${p} strategy...`),
+    "Architecting final content...",
   ];
+
   let i = 0;
   const interval = setInterval(() => {
     ticker.innerText = phrases[i++ % phrases.length];
@@ -73,10 +73,11 @@ async function generate() {
     );
     const data = await response.json();
 
-    // Save and Render
-    localStorage.setItem("lastResult", JSON.stringify(data.platforms));
-    renderCards(data.platforms);
-    document.getElementById("resetBtn").classList.remove("hidden");
+    if (data.platforms) {
+      localStorage.setItem("lastResult", JSON.stringify(data.platforms));
+      renderCards(data.platforms);
+      document.getElementById("resetBtn").classList.remove("hidden");
+    }
   } catch (e) {
     alert("Construction failed: " + e.message);
   } finally {
@@ -87,7 +88,7 @@ async function generate() {
 
 function renderCards(platforms) {
   const grid = document.getElementById("results");
-  grid.innerHTML = ""; // Hard clear to prevent duplicate cards
+  grid.innerHTML = "";
 
   Object.entries(platforms).forEach(([name, content]) => {
     const card = document.createElement("div");
@@ -99,13 +100,21 @@ function renderCards(platforms) {
         ? "bg-slate-900 border-slate-800 text-white shadow-xl"
         : "bg-white border-slate-200 text-slate-800 shadow-md";
 
-    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all`;
+    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all hover:border-blue-500/50`;
     card.innerHTML = `
             <div class="flex justify-between items-center mb-4">
                 <h3 class="capitalize font-bold text-lg">${name}</h3>
-                <div class="flex gap-3">
-                    <button onclick="copyText(this, \`${content.text}\`)" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-regular fa-copy"></i></button>
-                    <button onclick="openModal('${name}', \`${content.text}\`, '${content.imageKeyword}')" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-solid fa-mobile-screen-button"></i></button>
+                <div class="flex gap-3 text-slate-400">
+                    <button onclick="copyText(this, \`${content.text.replace(
+                      /`/g,
+                      "\\`"
+                    )}\`)" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-regular fa-copy"></i></button>
+                    <button onclick="openModal('${name}', \`${content.text.replace(
+      /`/g,
+      "\\`"
+    )}\` , '${
+      content.imageKeyword
+    }')" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-solid fa-mobile-screen-button"></i></button>
                 </div>
             </div>
             <p class="text-sm leading-relaxed opacity-90">${content.text}</p>
@@ -121,12 +130,11 @@ function openModal(platform, text, keyword) {
     ","
   )}`;
 
-  // Add a spinner placeholder for the image
   content.innerHTML = `
         <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl">
             <div class="p-4 flex items-center gap-2 border-b border-slate-900">
                 <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600"></div>
-                <span class="text-[10px] font-bold text-white tracking-tight">architect.ai</span>
+                <span class="text-[10px] font-bold text-white tracking-tight capitalize">${platform}.preview</span>
             </div>
             <div id="modalImgContainer" class="relative w-full aspect-square bg-slate-900 flex items-center justify-center">
                 <div id="imgSpinner" class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
@@ -134,7 +142,7 @@ function openModal(platform, text, keyword) {
             </div>
             <div class="p-5">
                 <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-regular fa-heart hover:text-red-500 cursor-pointer"></i><i class="fa-regular fa-comment"></i></div>
-                <p class="text-[11px] text-slate-300 leading-normal"><span class="font-bold text-white mr-1 underline">architect.ai</span> ${text}</p>
+                <p class="text-[11px] text-slate-300 leading-normal"><span class="font-bold text-white mr-1 underline">${platform}.ai</span> ${text}</p>
             </div>
         </div>
     `;
@@ -143,22 +151,18 @@ function openModal(platform, text, keyword) {
 }
 
 function imageLoaded() {
-  document.getElementById("imgSpinner").remove();
+  const spinner = document.getElementById("imgSpinner");
+  if (spinner) spinner.remove();
   document.getElementById("previewImg").classList.remove("opacity-0");
 }
 
 function resetApp() {
   if (confirm("Discard all progress and reset configuration?")) {
-    // Clear Inputs
     document.getElementById("productIdea").value = "";
     document.getElementById("results").innerHTML = "";
-
-    // Reset Checkboxes to checked state
     document
       .querySelectorAll(".platform-checkbox")
       .forEach((cb) => (cb.checked = true));
-
-    // Clear logic flags
     localStorage.removeItem("lastResult");
     document.getElementById("resetBtn").classList.add("hidden");
   }
