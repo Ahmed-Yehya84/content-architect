@@ -15,7 +15,11 @@ function toggleDarkMode() {
       "bg-slate-50 text-slate-900 min-h-screen font-sans transition-colors duration-300";
     icon.className = "fa-solid fa-sun text-yellow-500";
   }
-  refreshCurrentView();
+
+  // Ghosting fix: Only refresh view if results are present
+  if (document.getElementById("results").innerHTML !== "") {
+    refreshCurrentView();
+  }
 }
 
 function setCardStyle(style) {
@@ -28,7 +32,10 @@ function setCardStyle(style) {
     style === "glass"
       ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white font-bold"
       : "px-4 py-1 rounded-md text-xs text-slate-500 font-bold";
-  refreshCurrentView();
+
+  if (document.getElementById("results").innerHTML !== "") {
+    refreshCurrentView();
+  }
 }
 
 function refreshCurrentView() {
@@ -45,18 +52,17 @@ async function generate() {
   if (!productIdea || selectedPlatforms.length === 0)
     return alert("Please provide an idea and select at least one platform!");
 
-  // Logic Fix: Hard clear the grid and storage before new generation
   document.getElementById("results").innerHTML = "";
   localStorage.removeItem("lastResult");
+  document.getElementById("resetBtn").classList.add("hidden");
 
   document.getElementById("loading").classList.remove("hidden");
   const ticker = document.getElementById("tickerText");
   const phrases = [
     `Analyzing ${productIdea}...`,
-    ...selectedPlatforms.map((p) => `Designing ${p} strategy...`),
-    "Architecting final content...",
+    ...selectedPlatforms.map((p) => `Designing ${p} content...`),
+    "Architecting...",
   ];
-
   let i = 0;
   const interval = setInterval(() => {
     ticker.innerText = phrases[i++ % phrases.length];
@@ -100,11 +106,11 @@ function renderCards(platforms) {
         ? "bg-slate-900 border-slate-800 text-white shadow-xl"
         : "bg-white border-slate-200 text-slate-800 shadow-md";
 
-    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all hover:border-blue-500/50`;
+    card.className = `${baseStyle} p-6 rounded-2xl border fade-in mb-4 transition-all`;
     card.innerHTML = `
             <div class="flex justify-between items-center mb-4">
                 <h3 class="capitalize font-bold text-lg">${name}</h3>
-                <div class="flex gap-3 text-slate-400">
+                <div class="flex gap-3">
                     <button onclick="copyText(this, \`${content.text.replace(
                       /`/g,
                       "\\`"
@@ -112,7 +118,7 @@ function renderCards(platforms) {
                     <button onclick="openModal('${name}', \`${content.text.replace(
       /`/g,
       "\\`"
-    )}\` , '${
+    )}\`, '${
       content.imageKeyword
     }')" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-solid fa-mobile-screen-button"></i></button>
                 </div>
@@ -131,7 +137,7 @@ function openModal(platform, text, keyword) {
   )}`;
 
   content.innerHTML = `
-        <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl">
+        <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl mb-4">
             <div class="p-4 flex items-center gap-2 border-b border-slate-900">
                 <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600"></div>
                 <span class="text-[10px] font-bold text-white tracking-tight capitalize">${platform}.preview</span>
@@ -141,7 +147,7 @@ function openModal(platform, text, keyword) {
                 <img src="${dynamicUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="imageLoaded()">
             </div>
             <div class="p-5">
-                <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-regular fa-heart hover:text-red-500 cursor-pointer"></i><i class="fa-regular fa-comment"></i></div>
+                <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-regular fa-heart"></i><i class="fa-regular fa-comment"></i></div>
                 <p class="text-[11px] text-slate-300 leading-normal"><span class="font-bold text-white mr-1 underline">${platform}.ai</span> ${text}</p>
             </div>
         </div>
