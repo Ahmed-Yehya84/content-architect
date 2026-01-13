@@ -23,8 +23,6 @@ function toggleDarkMode() {
 
 function setCardStyle(style) {
   cardStyle = style;
-
-  // Updated class assignment for better button feedback
   const solidBtn = document.getElementById("solidBtn");
   const glassBtn = document.getElementById("glassBtn");
 
@@ -106,7 +104,6 @@ function renderCards(platforms) {
   Object.entries(platforms).forEach(([name, content]) => {
     const card = document.createElement("div");
 
-    // FIX: Enhanced logic for Light Mode + Glass visibility
     const baseStyle =
       cardStyle === "glass"
         ? "glass-card"
@@ -128,7 +125,7 @@ function renderCards(platforms) {
                     <button onclick="openModal('${name}', \`${content.text.replace(
       /`/g,
       "\\`"
-    )}\`, '${
+    )}\` , '${
       content.imageKeyword
     }')" class="cursor-pointer hover:text-blue-500 transition-colors">
                         <i class="fa-solid fa-mobile-screen-button"></i>
@@ -144,10 +141,15 @@ function renderCards(platforms) {
 function openModal(platform, text, keyword) {
   const content = document.getElementById("modalContent");
 
-  // FIX: Optimization for image relevance.
-  // We clean the keyword and add specific photography tags for LoremFlickr
-  const cleanKeyword = keyword.replace(/ /g, ",");
-  const dynamicUrl = `https://loremflickr.com/400/400/${cleanKeyword},photography,scenic/all`;
+  // FINAL FIX: Using Unsplash Source for better relevance and higher quality photos
+  // We prioritize the AI keyword but add 'landscape,nature' as professional fallbacks
+  const searchTerms = keyword
+    ? `${keyword.replace(/ /g, ",")},landscape`
+    : "travel,nature";
+  const dynamicUrl = `https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=400&q=60&sig=${Math.random()}`;
+
+  // NOTE: For the demo/video, we use a high-quality Unsplash search URL:
+  const finalUrl = `https://source.unsplash.com/featured/400x400?${searchTerms}`;
 
   content.innerHTML = `
         <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl mb-4">
@@ -157,7 +159,7 @@ function openModal(platform, text, keyword) {
             </div>
             <div id="modalImgContainer" class="relative w-full aspect-square bg-slate-900 flex items-center justify-center">
                 <div id="imgSpinner" class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
-                <img src="${dynamicUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="imageLoaded()">
+                <img src="${finalUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="imageLoaded()">
             </div>
             <div class="p-5">
                 <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-heart fa-regular"></i><i class="fa-comment fa-regular"></i></div>
