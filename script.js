@@ -141,15 +141,15 @@ function renderCards(platforms) {
 function openModal(platform, text, keyword) {
   const content = document.getElementById("modalContent");
 
-  // FINAL FIX: Using Unsplash Source for better relevance and higher quality photos
-  // We prioritize the AI keyword but add 'landscape,nature' as professional fallbacks
-  const searchTerms = keyword
-    ? `${keyword.replace(/ /g, ",")},landscape`
-    : "travel,nature";
-  const dynamicUrl = `https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=400&q=60&sig=${Math.random()}`;
+  // SANITIZATION: Clean the keyword and take the first 2 words max to prevent API errors
+  const cleanKeyword = keyword
+    ? keyword.split(" ").slice(0, 2).join(",")
+    : "nature";
 
-  // NOTE: For the demo/video, we use a high-quality Unsplash search URL:
-  const finalUrl = `https://source.unsplash.com/featured/400x400?${searchTerms}`;
+  // FALLBACK: A beautiful high-res nature photo if the primary one fails
+  const fallbackUrl =
+    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80";
+  const finalUrl = `https://source.unsplash.com/featured/400x400?${cleanKeyword},landscape&sig=${Math.random()}`;
 
   content.innerHTML = `
         <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl mb-4">
@@ -159,7 +159,9 @@ function openModal(platform, text, keyword) {
             </div>
             <div id="modalImgContainer" class="relative w-full aspect-square bg-slate-900 flex items-center justify-center">
                 <div id="imgSpinner" class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
-                <img src="${finalUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="imageLoaded()">
+                <img src="${finalUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" 
+                     onload="imageLoaded()" 
+                     onerror="this.src='${fallbackUrl}'; imageLoaded();">
             </div>
             <div class="p-5">
                 <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-heart fa-regular"></i><i class="fa-comment fa-regular"></i></div>
