@@ -10,12 +10,27 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <style>
+      /* FIX: Improved Glass Card for both Light and Dark modes */
       .glass-card {
         background: rgba(255, 255, 255, 0.03) !important;
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease;
       }
+
+      /* FIX: Visibility for Light Mode + Glass */
+      .bg-slate-50 .glass-card {
+        background: rgba(
+          0,
+          0,
+          0,
+          0.05
+        ) !important; /* Slight tint so it's visible on white */
+        border: 1px solid rgba(0, 0, 0, 0.1) !important; /* Darker border for light mode */
+        color: #0f172a !important; /* Force slate-900 text color */
+      }
+
       .fade-in {
         animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
@@ -33,7 +48,6 @@
         transition: background-color 0.5s ease;
       }
 
-      /* Custom Scrollbar for Modal */
       .custom-scrollbar::-webkit-scrollbar {
         width: 5px;
       }
@@ -92,7 +106,7 @@
                 id="productIdea"
                 class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-sm text-white outline-none [.bg-slate-50_&]:bg-slate-50 [.bg-slate-50_&]:border-slate-200 [.bg-slate-50_&]:text-slate-900"
                 rows="4"
-                placeholder="e.g., A 7-day road trip from Moscow to St. Petersburg, focusing on hidden gems and local food..."
+                placeholder="e.g., A 7-day road trip from Moscow to St. Petersburg..."
               ></textarea>
             </div>
 
@@ -102,8 +116,8 @@
                 >Select Social Media Platforms</label
               >
               <div class="grid grid-cols-2 gap-3">
-                <label class="group cursor-pointer"
-                  ><input
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="linkedin"
                     checked
@@ -113,10 +127,10 @@
                     class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-blue-500 group-has-[:checked]:text-blue-400 transition-all [.bg-slate-50_&]:border-slate-200"
                   >
                     LinkedIn
-                  </div></label
-                >
-                <label class="group cursor-pointer"
-                  ><input
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="instagram"
                     checked
@@ -126,10 +140,10 @@
                     class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-pink-500 group-has-[:checked]:text-pink-400 transition-all [.bg-slate-50_&]:border-slate-200"
                   >
                     Instagram
-                  </div></label
-                >
-                <label class="group cursor-pointer"
-                  ><input
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="tiktok"
                     checked
@@ -139,10 +153,10 @@
                     class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-cyan-500 group-has-[:checked]:text-cyan-400 transition-all [.bg-slate-50_&]:border-slate-200"
                   >
                     TikTok
-                  </div></label
-                >
-                <label class="group cursor-pointer"
-                  ><input
+                  </div>
+                </label>
+                <label class="group cursor-pointer">
+                  <input
                     type="checkbox"
                     value="youtube"
                     checked
@@ -152,8 +166,8 @@
                     class="flex items-center justify-center p-3 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 group-has-[:checked]:border-red-500 group-has-[:checked]:text-red-400 transition-all [.bg-slate-50_&]:border-slate-200"
                   >
                     YouTube
-                  </div></label
-                >
+                  </div>
+                </label>
               </div>
             </div>
 

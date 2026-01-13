@@ -23,14 +23,22 @@ function toggleDarkMode() {
 
 function setCardStyle(style) {
   cardStyle = style;
-  document.getElementById("solidBtn").className =
-    style === "solid"
-      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white font-bold"
-      : "px-4 py-1 rounded-md text-xs text-slate-500 font-bold";
-  document.getElementById("glassBtn").className =
-    style === "glass"
-      ? "px-4 py-1 rounded-md text-xs bg-slate-700 text-white font-bold"
-      : "px-4 py-1 rounded-md text-xs text-slate-500 font-bold";
+
+  // Updated class assignment for better button feedback
+  const solidBtn = document.getElementById("solidBtn");
+  const glassBtn = document.getElementById("glassBtn");
+
+  if (style === "solid") {
+    solidBtn.className =
+      "px-4 py-2 rounded-lg text-[10px] font-bold bg-slate-700 text-white transition-all";
+    glassBtn.className =
+      "px-4 py-2 rounded-lg text-[10px] font-bold text-slate-500 hover:text-white transition-all";
+  } else {
+    glassBtn.className =
+      "px-4 py-2 rounded-lg text-[10px] font-bold bg-slate-700 text-white transition-all";
+    solidBtn.className =
+      "px-4 py-2 rounded-lg text-[10px] font-bold text-slate-500 hover:text-white transition-all";
+  }
 
   if (document.getElementById("results").innerHTML !== "") {
     refreshCurrentView();
@@ -60,7 +68,7 @@ async function generate() {
   const phrases = [
     `Analyzing ${productIdea}...`,
     ...selectedPlatforms.map((p) => `Designing ${p} content...`),
-    "Architecting...",
+    "Architecting Strategy...",
   ];
   let i = 0;
   const interval = setInterval(() => {
@@ -98,10 +106,10 @@ function renderCards(platforms) {
   Object.entries(platforms).forEach(([name, content]) => {
     const card = document.createElement("div");
 
-    // ENHANCED VISIBILITY LOGIC: Added shadow-xl and ring border for Light Mode
+    // FIX: Enhanced logic for Light Mode + Glass visibility
     const baseStyle =
       cardStyle === "glass"
-        ? "glass-card text-white"
+        ? "glass-card"
         : isDarkMode
         ? "bg-slate-900 border-slate-800 text-white shadow-xl"
         : "bg-white border-slate-200 text-slate-800 shadow-xl ring-1 ring-slate-200/50";
@@ -114,13 +122,17 @@ function renderCards(platforms) {
                     <button onclick="copyText(this, \`${content.text.replace(
                       /`/g,
                       "\\`"
-                    )}\`)" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-regular fa-copy"></i></button>
+                    )}\`)" class="cursor-pointer hover:text-blue-500 transition-colors">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
                     <button onclick="openModal('${name}', \`${content.text.replace(
       /`/g,
       "\\`"
     )}\`, '${
       content.imageKeyword
-    }')" class="cursor-pointer hover:text-blue-500 transition-colors"><i class="fa-solid fa-mobile-screen-button"></i></button>
+    }')" class="cursor-pointer hover:text-blue-500 transition-colors">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </button>
                 </div>
             </div>
             <p class="text-sm leading-relaxed opacity-90">${content.text}</p>
@@ -131,10 +143,11 @@ function renderCards(platforms) {
 
 function openModal(platform, text, keyword) {
   const content = document.getElementById("modalContent");
-  const dynamicUrl = `https://loremflickr.com/400/400/${keyword.replace(
-    / /g,
-    ","
-  )}`;
+
+  // FIX: Optimization for image relevance.
+  // We clean the keyword and add specific photography tags for LoremFlickr
+  const cleanKeyword = keyword.replace(/ /g, ",");
+  const dynamicUrl = `https://loremflickr.com/400/400/${cleanKeyword},photography,scenic/all`;
 
   content.innerHTML = `
         <div class="bg-black rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl mb-4">
@@ -147,19 +160,21 @@ function openModal(platform, text, keyword) {
                 <img src="${dynamicUrl}" id="previewImg" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="imageLoaded()">
             </div>
             <div class="p-5">
-                <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-regular fa-heart"></i><i class="fa-regular fa-comment"></i></div>
+                <div class="flex gap-4 mb-3 text-white text-lg"><i class="fa-heart fa-regular"></i><i class="fa-comment fa-regular"></i></div>
                 <p class="text-[11px] text-slate-300 leading-normal"><span class="font-bold text-white mr-1 underline">${platform}.ai</span> ${text}</p>
             </div>
         </div>
     `;
-  document.getElementById("previewModal").classList.remove("hidden");
-  document.getElementById("previewModal").classList.add("flex");
+  const modal = document.getElementById("previewModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 function imageLoaded() {
   const spinner = document.getElementById("imgSpinner");
   if (spinner) spinner.remove();
-  document.getElementById("previewImg").classList.remove("opacity-0");
+  const img = document.getElementById("previewImg");
+  if (img) img.classList.remove("opacity-0");
 }
 
 function resetApp() {
@@ -176,13 +191,18 @@ function resetApp() {
 
 function closeModal() {
   document.getElementById("previewModal").classList.add("hidden");
+  document.getElementById("previewModal").classList.remove("flex");
 }
 
 async function copyText(btn, text) {
-  await navigator.clipboard.writeText(text);
-  const original = btn.innerHTML;
-  btn.innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i>';
-  setTimeout(() => {
-    btn.innerHTML = original;
-  }, 2000);
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i>';
+    setTimeout(() => {
+      btn.innerHTML = original;
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy text: ", err);
+  }
 }
